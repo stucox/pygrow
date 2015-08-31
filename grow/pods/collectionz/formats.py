@@ -64,7 +64,7 @@ class YamlFormat(Format):
       locales_to_fields = {}
       locales_to_bodies = {}
       locale = self.doc._locale_kwarg
-      default_locale = None
+      default_locale = self.doc.collection._default_locale
       for part in Format.split_front_matter(self.content):
         fields = utils.load_yaml(part, pod=self.doc.pod)
         if '$locale' in fields and '$locales' in fields:
@@ -100,7 +100,7 @@ class HtmlFormat(YamlFormat):
       locales_to_bodies = {}
       locales_to_fields = {}
       locale = self.doc._locale_kwarg
-      default_locale = None
+      default_locale = self.doc.collection._default_locale
       split_content = Format.split_front_matter(self.content)
       for part, body in utils.every_two(split_content):
         fields = utils.load_yaml(part, pod=self.doc.pod)

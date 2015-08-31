@@ -2,14 +2,20 @@
 $title: Multiple Locales
 $localization:
   path: /intl/{locale}/multiple-locales/
+  default_locale: en
   locales:
   - de
   - it
   - fr
 foo: base
+override_test: base
+---
+$locale: en
+override_test: en
 ---
 $locale: de
 foo: de
+override_test: de
 ---
 $locales:
 - it

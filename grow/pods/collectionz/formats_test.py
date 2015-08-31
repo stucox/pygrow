@@ -18,13 +18,24 @@ class FormatsTestCase(unittest.TestCase):
   def test_locales(self):
     path = '/content/localized/multiple-locales.yaml'
     doc = self.pod.get_doc(path)
+    expected = [
+        'fr',
+        'it',
+        'de'
+    ]
+    self.assertItemsEqual(expected, doc.locales)
+    self.assertEqual('en', doc.locale)
     self.assertEqual('base', doc.foo)
+    self.assertEqual('en', doc.override_test)
     de_doc = self.pod.get_doc(path, locale='de')
     self.assertEqual('de', de_doc.foo)
+    self.assertEqual('de', de_doc.override_test)
     it_doc = self.pod.get_doc(path, locale='it')
     self.assertEqual('it_fr', it_doc.foo)
+    self.assertEqual('base', it_doc.override_test)
     fr_doc = self.pod.get_doc(path, locale='fr')
     self.assertEqual('it_fr', fr_doc.foo)
+    self.assertEqual('base', fr_doc.override_test)
 
   def test_yaml(self):
     doc = self.pod.get_doc('/content/pages/home.yaml')
