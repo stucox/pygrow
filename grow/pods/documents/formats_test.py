@@ -54,6 +54,16 @@ class FormatsTestCase(unittest.TestCase):
     )
     self.assertEqual(content, doc.content)
 
+  def test_fallback(self):
+    doc = self.pod.get_doc('/content/localized/localized.yaml', locale='ja')
+    expected = {
+      'nested_item': {
+        'nested_item_title': 'JaTitle',
+        'nested_item_content': 'BaseContent'
+      }
+    }
+    self.assertEqual(expected, doc.nested_items)
+
 
 if __name__ == '__main__':
   unittest.main()

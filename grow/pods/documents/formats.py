@@ -56,6 +56,20 @@ class Format(object):
 
 class _SplitDocumentFormat(Format):
 
+  def _recursive_update(self, base, update):
+    for key, val in update.iteritems():
+      if isinstance(val, collections.Mapping):
+        base[key] = self._recursive_update(base.get(key, {}), val)
+      else:
+        base[key] = update[key]
+    return base
+
+  def _update_fields(self, fallback, fields, localized_fields):
+    if fallback == 'recursive':
+      self._recursive_update(fields, localized_fields)
+    else:
+      fields.update(localized_fields)
+
   def _handle_pairs_of_parts_and_bodies(self):
     try:
       locales_to_fields = collections.defaultdict(dict)
@@ -63,6 +77,7 @@ class _SplitDocumentFormat(Format):
       locale = self.doc._locale_kwarg
       default_locale = None
       document_level_default_locale = None
+      fallback = 'default'
       split_content = Format.split_front_matter(self.content)
       for i, parts in enumerate(self._iterate_content()):
         part, body = parts
@@ -72,6 +87,8 @@ class _SplitDocumentFormat(Format):
         if i == 0 and '$localization' in fields:
           if 'default_locale' in fields['$localization']:
             document_level_default_locale = fields['$localization']['default_locale']
+          if 'fallback' in fields['$localization']:
+            fallback = fields['$localization']['fallback']
 
         if '$locale' in fields and '$locales' in fields:
           text = 'You must specify either $locale or $locales, not both.'
@@ -93,7 +110,7 @@ class _SplitDocumentFormat(Format):
 
       if document_level_default_locale in locales_to_fields:
         localized_fields = locales_to_fields[locale]
-        fields.update(localized_fields)
+        self._update_fields(fallback, fields, localized_fields)
       default_body = locales_to_bodies.get(default_locale)
       self.body = locales_to_bodies.get(locale, default_body)
       self.body = self.body.strip() if self.body is not None else None

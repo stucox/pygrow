@@ -61,8 +61,9 @@ class Document(object):
             and self.pod_path == other.pod_path)
 
   def __getattr__(self, name):
-    if name in self.fields:
-      return self.fields[name]
+    fields = object.__getattribute__(self, 'fields')
+    if name in fields:
+      return fields[name]
     return object.__getattribute__(self, name)
 
   @webapp2.cached_property

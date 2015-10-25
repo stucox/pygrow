@@ -1,6 +1,7 @@
 ---
 $title: Localized
 $localization:
+  fallback: recursive
   path: /intl/{locale}/localized/
   default_locale: ja
   locales:
@@ -9,8 +10,15 @@ $localization:
   - de
 foo: base
 bar: baz
+nested_items:
+  nested_item:
+    nested_item_title: "BaseTitle"
+    nested_item_content: "BaseContent"
 ---
 $locale: ja
 foo: base_ja
+nested_items:
+  nested_item:
+    nested_item_title: "JaTitle"
 ---
 $locale: fr
