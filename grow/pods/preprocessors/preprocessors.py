@@ -6,6 +6,7 @@ import json
 _preprocessor_kinds_to_classes = {}
 
 _builtins = (
+    google_drive.GoogleDriveFolderPreprocessor,
     google_drive.GoogleDocsPreprocessor,
     google_drive.GoogleSheetsPreprocessor,
     sass_preprocessor.SassPreprocessor,
