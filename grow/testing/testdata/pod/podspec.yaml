@@ -41,6 +41,8 @@ localization:
     de_DE:
     - de
 
+tagged_field@: Tagged field in podspec
+
 deployments:
   gcs:
     destination: gcs

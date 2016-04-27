@@ -1,2 +1,6 @@
 title: Localized
 view: /views/base.html
+$localization:
+  locales:
+    - en
+    - fr

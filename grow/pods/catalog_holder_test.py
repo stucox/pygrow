@@ -1,3 +1,4 @@
+# coding: utf-8
 from grow.pods import pods
 from grow.pods import storage
 from grow.testing import testing
@@ -18,13 +19,25 @@ class CatalogsTest(unittest.TestCase):
 
     def test_extract(self):
         template_catalog = self.pod.catalogs.extract()
-        self.assertEqual(20, len(template_catalog))
+        self.assertEqual(30, len(template_catalog))
         expected = [
             'Hello World!',
             'Hello World 2!',
             'Tagged String',
             'Tagged String in List 1',
             'Tagged String in List 2',
+            'Tagged localized title.',
+            'Tagged field in podspec',
+            'string content tagged',
+            'standalone string content tagged',
+            'General body content',
+            u'DE body content with ünicodé',
+            'Global string',
+            'Global string in HTML',
+            'Global string in CSV',
+            'CSV with blueprint locales',
+            'Body content for blueprint locales',
+            'YAML content for blueprint locales',
         ]
         for string in expected:
             self.assertIn(string, template_catalog)
@@ -47,12 +60,56 @@ class CatalogsTest(unittest.TestCase):
 
     def test_localized_extract(self):
         self.pod.catalogs.extract(localized=True)
+
+        # Pod locale (defined in podspec)
         fr_catalog = self.pod.catalogs.get('fr')
+        # - from various contexts around the pod
         self.assertIn('Tagged localized title.', fr_catalog)
+        self.assertIn('Tagged field in podspec', fr_catalog)
+        self.assertIn('string content tagged', fr_catalog)
+        self.assertIn('standalone string content tagged', fr_catalog)
+        self.assertIn('General body content', fr_catalog)
+        self.assertIn('Body content for blueprint locales', fr_catalog)
+        self.assertIn('YAML content for blueprint locales', fr_catalog)
+        self.assertIn('Global string', fr_catalog)
+        self.assertIn('Global string in HTML', fr_catalog)
+        self.assertIn('Global string in CSV', fr_catalog)
+        # - from contexts which explicitly declare other locales (not fr)
         self.assertNotIn('Tagged localized body.', fr_catalog)
+
+        # Another pod locale
+        de_catalog = self.pod.catalogs.get('de')
+        self.assertIn('AboutDE', de_catalog)
+        self.assertIn(u'DE body content with ünicodé', de_catalog)
+
+        # Non-pod locale (not defined in podspec)
         hi_catalog = self.pod.catalogs.get('hi_IN')
+        # - from contexts which explicitly declare hi_IN
         self.assertIn('Tagged localized title.', hi_catalog)
         self.assertIn('Tagged localized body.', hi_catalog)
+
+        # Current (potentially undesirable) behaviour:-
+
+        # 1. Strings in locale-specific doc parts are extracted for all the
+        #    doc's locales
+        self.assertIn('AboutDE', fr_catalog)
+        self.assertIn(u'DE body content with ünicodé', fr_catalog)
+
+        # 2. Strings in various 'global' contexts are extracted for EVERY
+        #    locale used ANYWHERE in the pod (not just those in podspec.yaml):
+        # a. In podspec.yaml
+        self.assertIn('Tagged field in podspec', hi_catalog)
+        # b. In CSV files in /content/ or /data/
+        self.assertIn('string content tagged', hi_catalog)
+        self.assertIn('standalone string content tagged', hi_catalog)
+        self.assertIn('CSV with blueprint locales', hi_catalog)
+        # c. In /content/ without $localization defined in doc
+        self.assertIn('Global string', hi_catalog)
+        self.assertIn('Global string in HTML', hi_catalog)
+        self.assertIn('Global string in CSV', hi_catalog)
+        # d. ... even if locales are specified in the blueprint
+        self.assertIn('Body content for blueprint locales', hi_catalog)
+        self.assertIn('YAML content for blueprint locales', hi_catalog)
 
     def test_iter(self):
         locales = self.pod.catalogs.list_locales()

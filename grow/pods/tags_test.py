@@ -23,7 +23,7 @@ class BuiltinsTestCase(unittest.TestCase):
 
     def test_collections(self):
         collections = tags.collections(_pod=self.pod)
-        self.assertEqual(4, len(collections))
+        self.assertEqual(5, len(collections))
         paths = ['pages', 'posts']
         collections = tags.collections(paths, _pod=self.pod)
         for collection in collections:
